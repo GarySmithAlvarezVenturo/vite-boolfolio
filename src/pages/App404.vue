@@ -3,7 +3,7 @@ export default {};
 </script>
 
 <template>
-  <h2>Sono la home</h2>
+  <h1>Page not found</h1>
 </template>
 
 <style></style>

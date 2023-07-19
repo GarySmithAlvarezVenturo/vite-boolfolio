@@ -6,10 +6,12 @@ export default {
   data() {
     return {
       arrProjects: [],
+      arrTypes: [],
       currentPage: 1,
       nPages: 0,
       firstPage: false,
       lastPage: false,
+      loader: true,
     };
   },
   methods: {
@@ -35,30 +37,31 @@ export default {
       }
       this.lastPage = false;
     },
+    getTypes() {
+      axios.get("http://localhost:8000/api/types").then((response) => {
+        this.arrTypes = response.data.results;
+      });
+    },
     getProjects() {
+      this.loader = true;
       axios
         .get("http://localhost:8000/api/projects", {
           params: {
             page: this.currentPage,
+            // se sto già in prjects.index non esegue il craeated e non aggiorna la pagina
+            q: new URLSearchParams(window.location.search).get("q"),
           },
         })
         .then((response) => {
-          this.arrProjects = response.data.data;
-          this.nPages = response.data.last_page;
+          this.arrProjects = response.data.results.data;
+          this.nPages = response.data.results.last_page;
+          this.loader = false;
         });
     },
   },
   created() {
-    axios
-      .get("http://localhost:8000/api/projects", {
-        params: {
-          page: this.nPage,
-        },
-      })
-      .then((response) => {
-        this.arrProjects = response.data.data;
-        this.nPages = response.data.last_page;
-      });
+    this.getTypes();
+    this.getProjects();
   },
   watch: {
     currentPage() {
@@ -71,13 +74,25 @@ export default {
 
 <template>
   <div class="container">
-    <h1 class="text-danger">Boolpress</h1>
-    <div class="row row-cols-3">
+    <form>
+      <label class="mb-2" for="type">Type</label>
+      <select class="form-select w-25" id="type">
+        <option v-for="type in arrTypes" :key="type.id" :value="type.id">
+          {{ type.name }}
+        </option>
+      </select>
+    </form>
+    {{ loader }}
+    <div v-if="!loader" class="row row-cols-3 my-5">
       <CardProject
         v-for="project in arrProjects"
         :key="project.id"
         :dataCard="project"
       />
+    </div>
+    <div v-else>
+      caricamento
+      <!-- caricamento in corso  -->
     </div>
 
     <nav>

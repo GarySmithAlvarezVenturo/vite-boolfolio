@@ -3,7 +3,7 @@ export default {};
 </script>
 
 <template>
-  <h2>Sono la home</h2>
+  <h1>sono l'about</h1>
 </template>
 
-<style></style>
+<style lang="scss" scoped></style>
